@@ -57,7 +57,9 @@
     }
     header p,
     .status,
-    .score-note {
+    .score-note,
+    .public-note,
+    .field-help {
       max-width: 68ch;
       color: var(--muted);
       font-size: .95rem;
@@ -80,6 +82,38 @@
       flex-wrap: wrap;
       gap: .5rem;
       align-items: center;
+    }
+    .publish-form {
+      display: grid;
+      gap: .75rem;
+    }
+    .publish-field {
+      display: grid;
+      gap: .3rem;
+      max-width: 28rem;
+    }
+    .publish-field label {
+      color: #243142;
+      font-weight: 780;
+    }
+    .publish-field input {
+      width: 100%;
+      min-height: 2.75rem;
+      padding: .55rem .7rem;
+      border: 1px solid #a9bab3;
+      border-radius: .2rem;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+    .publish-field input:focus {
+      border-color: #0c665d;
+      outline: 3px solid rgba(12, 102, 93, .16);
+      outline-offset: 1px;
+    }
+    .public-note,
+    .field-help {
+      margin: 0;
     }
     .profile-row {
       display: grid;
@@ -142,7 +176,7 @@
       object-fit: cover;
     }
     button {
-      min-height: 2.35rem;
+      min-height: 2.75rem;
       border: 1px solid #a9bab3;
       border-radius: .2rem;
       background: #fff;
@@ -152,6 +186,20 @@
       padding: .45rem .75rem;
     }
     button:hover { background: #e8f4f0; border-color: #8cb3aa; color: #0d4b44; }
+    button:disabled {
+      cursor: wait;
+      opacity: .68;
+    }
+    .publish-button {
+      background: #0c665d;
+      border-color: #0c665d;
+      color: #fff;
+    }
+    .publish-button:hover {
+      background: #094d47;
+      border-color: #094d47;
+      color: #fff;
+    }
     .status { min-height: 1.4rem; margin: 0; overflow-wrap: anywhere; }
     .score-note {
       display: grid;
@@ -219,35 +267,47 @@
   <main>
     <a class="back" href="index.html">Volver al apunte</a>
     <header>
-      <h1>Leaderboard de certificación</h1>
-      <p>Sin cuenta ni signin: al publicar, se pide un nombre visible y se sube solo ese nombre con el puntaje calculado desde tu progreso local.</p>
+      <h1>Leaderboard de práctica</h1>
+      <p>Ranking informal para motivarse mientras repasás. No certifica nada: solo muestra una tabla pública con puntajes calculados desde el progreso local.</p>
     </header>
 
     <section class="panel" aria-labelledby="board-title">
-      <h2 id="board-title">Tabla pública</h2>
+      <h2 id="board-title">Tabla pública informal</h2>
       <p class="status" id="status" aria-live="polite">Cargando...</p>
-      <div class="profile-row">
-        <div class="avatar-preview" aria-label="Foto elegida">
-          <img id="avatarPreview" alt="" hidden>
-          <span id="avatarFallback">Foto</span>
+      <div class="publish-form" aria-label="Publicar puntaje">
+        <p class="public-note">Publicar es opcional. Si publicás, tu nombre, foto opcional y score quedan visibles para cualquiera que abra este leaderboard. La posición es informal, no verificada y depende de datos guardados en este navegador.</p>
+        <div class="publish-field">
+          <label for="displayName">Nombre público</label>
+          <input id="displayName" type="text" maxlength="32" autocomplete="name" placeholder="Tu nombre o alias">
         </div>
-        <div>
-          <div class="photo-actions">
-            <button id="importPhoto" type="button">Importar foto</button>
-            <button id="takePhoto" type="button">Tomar foto</button>
-            <button id="removePhoto" type="button">Quitar</button>
-            <input id="avatarFile" type="file" accept="image/*" hidden>
+        <div class="profile-row">
+          <div class="avatar-preview" aria-label="Foto elegida">
+            <img id="avatarPreview" alt="" hidden>
+            <span id="avatarFallback">Foto</span>
+          </div>
+          <div>
+            <p class="field-help">Foto pública opcional.</p>
+            <div class="photo-actions">
+              <button id="importPhoto" type="button">Importar foto</button>
+              <button id="takePhoto" type="button">Tomar foto</button>
+              <button id="removePhoto" type="button">Quitar</button>
+              <input id="avatarFile" type="file" accept="image/*" hidden>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="camera-panel" id="cameraPanel" hidden>
-        <video id="cameraVideo" autoplay playsinline muted></video>
+        <div class="camera-panel" id="cameraPanel" hidden>
+          <video id="cameraVideo" autoplay playsinline muted></video>
+          <div class="actions">
+            <button id="capturePhoto" type="button">Usar esta foto</button>
+            <button id="cancelCamera" type="button">Cancelar cámara</button>
+          </div>
+        </div>
+        <div class="score-note" id="scoreNote"></div>
         <div class="actions">
-          <button id="capturePhoto" type="button">Usar esta foto</button>
-          <button id="cancelCamera" type="button">Cancelar cámara</button>
+          <button class="publish-button" id="publishScore" type="button">Publicar puntaje</button>
+          <button id="refreshLeaderboard" type="button">Actualizar tabla</button>
         </div>
       </div>
-      <div class="score-note" id="scoreNote"></div>
       <ol id="leaderboard">
         <li><span class="rank">--</span><span class="avatar">--</span><span class="name">Cargando leaderboard</span><span class="score">--</span></li>
       </ol>
@@ -264,31 +324,65 @@
   <script>
   (function () {
     const sectionIds = ['fundamentos','imitacion','pg','actor-critic','valor','dqn','pg-avanzado','ac-avanzado','comparaciones','demos','ejercicios','preguntas','glosario'];
-    const config = window.RL_SUPABASE_CONFIG;
+    const config = Object.assign({ url: '', anonKey: '', table: 'rl_leaderboard' }, window.RL_SUPABASE_CONFIG || {});
     const status = document.getElementById('status');
     const board = document.getElementById('leaderboard');
     const scoreNote = document.getElementById('scoreNote');
+    const displayName = document.getElementById('displayName');
+    const publishScore = document.getElementById('publishScore');
+    const refreshLeaderboard = document.getElementById('refreshLeaderboard');
     const avatarPreview = document.getElementById('avatarPreview');
     const avatarFallback = document.getElementById('avatarFallback');
     const avatarFile = document.getElementById('avatarFile');
     const cameraPanel = document.getElementById('cameraPanel');
     const cameraVideo = document.getElementById('cameraVideo');
     let cameraStream = null;
+    let sessionParticipantId = null;
     const storage = {
       get(key) { try { return localStorage.getItem(key); } catch (err) { return null; } },
       set(key, value) { try { localStorage.setItem(key, value); } catch (err) {} },
       remove(key) { try { localStorage.removeItem(key); } catch (err) {} }
     };
+    const participantIdKey = 'rl-leaderboard-participant-id';
+    const displayNameKey = 'rl-leaderboard-name';
     const avatarKey = 'rl-leaderboard-avatar';
 
     function setStatus(message) { status.textContent = message; }
+    function cleanText(value) {
+      return String(value || '').replace(/\s+/g, ' ').trim();
+    }
+    function cleanDisplayName(value) {
+      return cleanText(value).replace(/[^\p{L}\p{N} ._-]/gu, '').slice(0, 32);
+    }
+    function leaderboardConfigured() {
+      return Boolean(config.url && config.anonKey && config.table);
+    }
+    function participantId() {
+      const stored = storage.get(participantIdKey);
+      if (stored) return stored;
+      if (sessionParticipantId) return sessionParticipantId;
+      const random = window.crypto?.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionParticipantId = 'anon-' + random;
+      storage.set(participantIdKey, sessionParticipantId);
+      return sessionParticipantId;
+    }
+    function safeCount(value, fallback) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return fallback || 0;
+      return Math.max(0, Math.floor(numeric));
+    }
     function countStored(prefix, predicate) {
       let count = 0;
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (!key || !key.startsWith(prefix)) continue;
-        const value = storage.get(key);
-        if (!predicate || predicate(value, key)) count += 1;
+      try {
+        const length = safeCount(localStorage.length);
+        for (let i = 0; i < length; i += 1) {
+          const key = localStorage.key(i);
+          if (!key || !key.startsWith(prefix)) continue;
+          const value = storage.get(key);
+          if (!predicate || predicate(value, key)) count += 1;
+        }
+      } catch (err) {
+        return 0;
       }
       return count;
     }
@@ -299,31 +393,39 @@
         try {
           const parsed = JSON.parse(raw);
           if (!parsed.checked) return sum;
-          if (Number.isFinite(Number(parsed.score))) return sum + Number(parsed.score);
-          if (parsed.passed) return sum + Number(parsed.total || 3);
+          if (Number.isFinite(Number(parsed.score))) return sum + safeCount(parsed.score);
+          if (parsed.passed) return sum + safeCount(parsed.total, 3);
         } catch (err) {}
         return sum;
       }, 0);
     }
+    function globalQuizCorrectCount() {
+      return countStored('rl-quiz-attempt-v1:', (value) => {
+        if (!value) return false;
+        try { return JSON.parse(value).correct === true; } catch (err) { return false; }
+      });
+    }
     function currentScore() {
       const miniCorrect = miniQuizCorrectCount();
-      const globalCorrect = countStored('rl-quiz-v2:', value => value === 'known');
+      const globalCorrect = globalQuizCorrectCount();
       const certificates = sectionIds.filter(id => storage.get('rl-section-cert-v1:' + id)).length;
       const miniPassed = sectionIds.filter((id) => {
         const raw = storage.get('rl-mini-quiz-v2:' + id);
         if (!raw) return false;
-        try { return JSON.parse(raw).passed === true; } catch (err) { return false; }
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed.checked === true && parsed.passed === true;
+        } catch (err) { return false; }
       }).length;
-      const quizKnown = countStored('rl-quiz-v2:', value => value === 'known');
       const demosKnown = countStored('rl-demo-v1:', value => value === 'known');
       const score = miniCorrect + globalCorrect;
-      return { score, miniCorrect, globalCorrect, certificates, miniPassed, quizKnown, demosKnown };
+      return { score, miniCorrect, globalCorrect, certificates, miniPassed, quizKnown: globalCorrect, demosKnown };
     }
     function renderScoreNote() {
       const s = currentScore();
       scoreNote.innerHTML = '';
       [
-        ['respuestas correctas', s.score],
+        ['score local', s.score],
         ['mini quiz', s.miniCorrect],
         ['preguntas globales', s.globalCorrect]
       ].forEach(([label, value]) => {
@@ -436,7 +538,9 @@
         throw error;
       }
       if (res.status === 204) return null;
-      return res.json();
+      const text = await res.text().catch(() => '');
+      if (!text) return null;
+      return JSON.parse(text);
     }
     function renderRows(rows) {
       board.innerHTML = '';
@@ -463,6 +567,10 @@
       });
     }
     async function loadLeaderboard(silent) {
+      if (!leaderboardConfigured()) {
+        if (!silent) setStatus('Falta configurar URL y publishable key de Supabase.');
+        return;
+      }
       try {
         if (!silent) setStatus('Cargando leaderboard...');
         let rows;
@@ -487,6 +595,80 @@
         if (!silent) setStatus(err.status === 404 ? 'Supabase conectado, pero falta la tabla rl_leaderboard.' : 'No pude leer Supabase. Revisá tabla/RLS/config.');
       }
     }
+    function leaderboardPayload(name) {
+      const summary = currentScore();
+      const avatarData = storage.get(avatarKey);
+      return {
+        participant_id: participantId(),
+        display_name: name,
+        score: summary.score,
+        certificates: summary.certificates,
+        mini_quizzes: summary.miniPassed,
+        quiz_known: summary.quizKnown,
+        demos_known: summary.demosKnown,
+        avatar_data: isSafeAvatarData(avatarData) ? avatarData : null
+      };
+    }
+    async function upsertLeaderboardPayload(payload) {
+      const path = encodeURIComponent(config.table) + '?on_conflict=participant_id';
+      const headers = { Prefer: 'resolution=merge-duplicates,return=minimal' };
+      try {
+        await supabaseRequest(path, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(payload)
+        });
+        return { avatarStatus: payload.avatar_data ? 'published' : 'none' };
+      } catch (err) {
+        if (err.status === 400 && String(err.message).includes('avatar_data')) {
+          const fallback = Object.assign({}, payload);
+          delete fallback.avatar_data;
+          await supabaseRequest(path, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(fallback)
+          });
+          return { avatarStatus: payload.avatar_data ? 'skipped' : 'none' };
+        }
+        throw err;
+      }
+    }
+    async function publishLeaderboardScore() {
+      if (!leaderboardConfigured()) {
+        setStatus('Configurá window.RL_SUPABASE_CONFIG antes de publicar.');
+        return;
+      }
+      const name = cleanDisplayName(displayName.value);
+      displayName.value = name;
+      if (name.length < 2) {
+        setStatus('Usá un nombre público de al menos 2 caracteres.');
+        return;
+      }
+      renderScoreNote();
+      const payload = leaderboardPayload(name);
+      publishScore.disabled = true;
+      publishScore.textContent = 'Publicando...';
+      try {
+        setStatus('Publicando puntaje...');
+        const result = await upsertLeaderboardPayload(payload);
+        storage.set(displayNameKey, name);
+        await loadLeaderboard(true);
+        if (result.avatarStatus === 'published') {
+          setStatus('Puntaje publicado. Tu nombre, foto y score ya son públicos en este leaderboard informal.');
+        } else if (result.avatarStatus === 'skipped') {
+          setStatus('Puntaje publicado. Tu nombre y score ya son públicos; Supabase no aceptó la columna de foto.');
+        } else {
+          setStatus('Puntaje publicado. Tu nombre y score ya son públicos en este leaderboard informal, sin foto.');
+        }
+      } catch (err) {
+        setStatus(err.status === 404
+          ? 'Supabase conectado, pero falta la tabla rl_leaderboard.'
+          : 'No pude publicar. Revisá columnas, constraint participant_id y RLS de INSERT/UPSERT para anon.');
+      } finally {
+        publishScore.disabled = false;
+        publishScore.textContent = 'Publicar puntaje';
+      }
+    }
     document.getElementById('importPhoto').addEventListener('click', () => avatarFile.click());
     document.getElementById('takePhoto').addEventListener('click', startCamera);
     document.getElementById('capturePhoto').addEventListener('click', captureAvatar);
@@ -501,7 +683,10 @@
       avatarFile.value = '';
       if (file) importAvatar(file);
     });
+    publishScore.addEventListener('click', publishLeaderboardScore);
+    refreshLeaderboard.addEventListener('click', () => loadLeaderboard());
     window.addEventListener('pagehide', stopCamera);
+    displayName.value = cleanDisplayName(storage.get(displayNameKey));
     renderAvatarPreview();
     renderScoreNote();
     loadLeaderboard();
