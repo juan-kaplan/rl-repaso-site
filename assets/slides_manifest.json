@@ -1,0 +1,371 @@
+[
+  {
+    "id": "imitacion_proceso",
+    "pdf": "Clase 2 - Aprendizaje por imitación(2).pdf",
+    "page": 5,
+    "title": "Clonación de comportamiento",
+    "desc": "Proceso: dataset de demostraciones y entrenamiento supervisado de una política.",
+    "file": "assets/slides/imitacion_proceso.jpg",
+    "pdf_page": 5
+  },
+  {
+    "id": "imitacion_shift",
+    "pdf": "Clase 2 - Aprendizaje por imitación(2).pdf",
+    "page": 7,
+    "title": "Limitación: desplazamiento distribucional",
+    "desc": "Un pequeño error de acción cambia los estados futuros visitados.",
+    "file": "assets/slides/imitacion_shift.jpg",
+    "pdf_page": 7
+  },
+  {
+    "id": "imitacion_dagger",
+    "pdf": "Clase 2 - Aprendizaje por imitación(2).pdf",
+    "page": 25,
+    "title": "DAgger",
+    "desc": "Usar la política aprendida para recolectar nuevos estados y etiquetarlos.",
+    "file": "assets/slides/imitacion_dagger.jpg",
+    "pdf_page": 25
+  },
+  {
+    "id": "bases_mdp",
+    "pdf": "Clase 3 - Bases del RL(2).pdf",
+    "page": 6,
+    "title": "MDP",
+    "desc": "Estados, acciones, transición, recompensa y distribución de estados.",
+    "file": "assets/slides/bases_mdp.jpg",
+    "pdf_page": 6
+  },
+  {
+    "id": "bases_objetivo",
+    "pdf": "Clase 3 - Bases del RL(2).pdf",
+    "page": 9,
+    "title": "Objetivo de RL",
+    "desc": "Maximización de recompensa acumulada esperada sobre trayectorias.",
+    "file": "assets/slides/bases_objetivo.jpg",
+    "pdf_page": 9
+  },
+  {
+    "id": "bases_qv",
+    "pdf": "Clase 3 - Bases del RL(2).pdf",
+    "page": 22,
+    "title": "Relación entre Q y V",
+    "desc": "V como esperanza de Q bajo la política.",
+    "file": "assets/slides/bases_qv.jpg",
+    "pdf_page": 22
+  },
+  {
+    "id": "bases_algoritmos",
+    "pdf": "Clase 3 - Bases del RL(2).pdf",
+    "page": 28,
+    "title": "Comparación de familias",
+    "desc": "Gradiente, actor-crítico, valor y modelo.",
+    "file": "assets/slides/bases_algoritmos.jpg",
+    "pdf_page": 28
+  },
+  {
+    "id": "pg_gradiente",
+    "pdf": "Clase 4 - Gradientes de política(2).pdf",
+    "page": 5,
+    "title": "Derivación de Policy Gradient",
+    "desc": "Log-derivative trick y cancelación de términos independientes de θ.",
+    "file": "assets/slides/pg_gradiente.jpg",
+    "pdf_page": 5
+  },
+  {
+    "id": "pg_reinforce",
+    "pdf": "Clase 4 - Gradientes de política(2).pdf",
+    "page": 6,
+    "title": "REINFORCE práctico",
+    "desc": "Muestrear trayectorias, estimar gradiente, actualizar θ.",
+    "file": "assets/slides/pg_reinforce.jpg",
+    "pdf_page": 6
+  },
+  {
+    "id": "pg_baseline",
+    "pdf": "Clase 4 - Gradientes de política(2).pdf",
+    "page": 13,
+    "title": "Baseline",
+    "desc": "Restar una recompensa media reduce varianza sin sesgar el gradiente.",
+    "file": "assets/slides/pg_baseline.jpg",
+    "pdf_page": 13
+  },
+  {
+    "id": "pg_importance",
+    "pdf": "Clase 4 - Gradientes de política(2).pdf",
+    "page": 18,
+    "title": "Importance sampling en PG",
+    "desc": "Reutilizar muestras de otra política con cocientes de probabilidad.",
+    "file": "assets/slides/pg_importance.jpg",
+    "pdf_page": 18
+  },
+  {
+    "id": "pg_natural",
+    "pdf": "Clase 4 - Gradientes de política(2).pdf",
+    "page": 25,
+    "title": "KL y gradiente natural",
+    "desc": "Fisher reescala el gradiente según sensibilidad de la política.",
+    "file": "assets/slides/pg_natural.jpg",
+    "pdf_page": 25
+  },
+  {
+    "id": "ac_advantage",
+    "pdf": "Clase 5,6 - Actor-Crítico(1).pdf",
+    "page": 5,
+    "title": "Baseline y ventaja en AC",
+    "desc": "A = Q - V; V como promedio pesado de Q.",
+    "file": "assets/slides/ac_advantage.jpg",
+    "pdf_page": 5
+  },
+  {
+    "id": "ac_bootstrap",
+    "pdf": "Clase 5,6 - Actor-Crítico(1).pdf",
+    "page": 12,
+    "title": "Bootstrap",
+    "desc": "Target r + γV(s’) para reducir varianza frente a Monte Carlo.",
+    "file": "assets/slides/ac_bootstrap.jpg",
+    "pdf_page": 12
+  },
+  {
+    "id": "ac_batch",
+    "pdf": "Clase 5,6 - Actor-Crítico(1).pdf",
+    "page": 17,
+    "title": "Actor-Crítico batch",
+    "desc": "A = r + γV(s’) - V(s) y actualización del actor.",
+    "file": "assets/slides/ac_batch.jpg",
+    "pdf_page": 17
+  },
+  {
+    "id": "ac_bias_var",
+    "pdf": "Clase 5,6 - Actor-Crítico(1).pdf",
+    "page": 29,
+    "title": "AC vs PG: sesgo-varianza",
+    "desc": "AC reduce varianza pero puede introducir sesgo.",
+    "file": "assets/slides/ac_bias_var.jpg",
+    "pdf_page": 29
+  },
+  {
+    "id": "ac_gae",
+    "pdf": "Clase 5,6 - Actor-Crítico(1).pdf",
+    "page": 31,
+    "title": "GAE",
+    "desc": "Combinación de ventajas a distintos horizontes n.",
+    "file": "assets/slides/ac_gae.jpg",
+    "pdf_page": 31
+  },
+  {
+    "id": "value_policy_iteration",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 4,
+    "title": "Policy Iteration",
+    "desc": "Evaluar ventaja y mejorar la política.",
+    "file": "assets/slides/value_policy_iteration.jpg",
+    "pdf_page": 4
+  },
+  {
+    "id": "value_value_iteration",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 9,
+    "title": "Value Iteration",
+    "desc": "Q ← r + γE[V] y V ← max Q.",
+    "file": "assets/slides/value_value_iteration.jpg",
+    "pdf_page": 9
+  },
+  {
+    "id": "value_fqi",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 14,
+    "title": "Fitted Q Iteration",
+    "desc": "Aprendizaje supervisado con targets de Bellman sobre Q.",
+    "file": "assets/slides/value_fqi.jpg",
+    "pdf_page": 14
+  },
+  {
+    "id": "value_convergence",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 22,
+    "title": "Convergencia tabular",
+    "desc": "Bellman como contracción en norma infinito.",
+    "file": "assets/slides/value_convergence.jpg",
+    "pdf_page": 22
+  },
+  {
+    "id": "value_non_tabular",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 26,
+    "title": "No tabular",
+    "desc": "La proyección rompe garantías generales de convergencia.",
+    "file": "assets/slides/value_non_tabular.jpg",
+    "pdf_page": 26
+  },
+  {
+    "id": "dqn_replay",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 33,
+    "title": "Replay buffer",
+    "desc": "Muestreo aleatorio de transiciones para descorrelacionar datos.",
+    "file": "assets/slides/dqn_replay.jpg",
+    "pdf_page": 33
+  },
+  {
+    "id": "dqn_target",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 35,
+    "title": "Red objetivo",
+    "desc": "Target más estable para aproximar aprendizaje supervisado.",
+    "file": "assets/slides/dqn_target.jpg",
+    "pdf_page": 35
+  },
+  {
+    "id": "dqn_double",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 46,
+    "title": "Double Q Learning",
+    "desc": "Separar selección y evaluación para reducir sobreestimación.",
+    "file": "assets/slides/dqn_double.jpg",
+    "pdf_page": 46
+  },
+  {
+    "id": "dqn_nstep",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 47,
+    "title": "Retornos a n-pasos",
+    "desc": "Más recompensa observada antes del bootstrap.",
+    "file": "assets/slides/dqn_nstep.jpg",
+    "pdf_page": 47
+  },
+  {
+    "id": "dqn_ddpg",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 57,
+    "title": "DDPG",
+    "desc": "Actor aprende la acción que maximiza Q en espacios continuos.",
+    "file": "assets/slides/dqn_ddpg.jpg",
+    "pdf_page": 57
+  },
+  {
+    "id": "rainbow_per",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 60,
+    "title": "Prioritized replay",
+    "desc": "Muestrear más transiciones con alto TD error.",
+    "file": "assets/slides/rainbow_per.jpg",
+    "pdf_page": 60
+  },
+  {
+    "id": "rainbow_dueling",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 61,
+    "title": "Dueling DQN",
+    "desc": "Separar V(s) y A(s,a) para construir Q.",
+    "file": "assets/slides/rainbow_dueling.jpg",
+    "pdf_page": 61
+  },
+  {
+    "id": "rainbow_summary",
+    "pdf": "Clase 7,8,9 - Métodos de valor(2).pdf",
+    "page": 64,
+    "title": "Rainbow",
+    "desc": "Integración de mejoras de DQN.",
+    "file": "assets/slides/rainbow_summary.jpg",
+    "pdf_page": 64
+  },
+  {
+    "id": "adv_pg_kl_norm",
+    "pdf": "Clase 10 - Gradientes de política avanzados(2).pdf",
+    "page": 15,
+    "title": "KL vs norma de parámetros",
+    "desc": "Restringir cambio funcional de la política, no solo parámetros.",
+    "file": "assets/slides/adv_pg_kl_norm.jpg",
+    "pdf_page": 15
+  },
+  {
+    "id": "adv_pg_fisher",
+    "pdf": "Clase 10 - Gradientes de política avanzados(2).pdf",
+    "page": 16,
+    "title": "Fisher y gradiente natural",
+    "desc": "Aproximación de KL de segundo orden.",
+    "file": "assets/slides/adv_pg_fisher.jpg",
+    "pdf_page": 16
+  },
+  {
+    "id": "adv_pg_trpo",
+    "pdf": "Clase 10 - Gradientes de política avanzados(2).pdf",
+    "page": 18,
+    "title": "TRPO",
+    "desc": "Trust region con KL y gradiente conjugado.",
+    "file": "assets/slides/adv_pg_trpo.jpg",
+    "pdf_page": 18
+  },
+  {
+    "id": "adv_pg_ppo",
+    "pdf": "Clase 10 - Gradientes de política avanzados(2).pdf",
+    "page": 19,
+    "title": "PPO Penalty y PPO Clip",
+    "desc": "Dos formas de mantener políticas próximas.",
+    "file": "assets/slides/adv_pg_ppo.jpg",
+    "pdf_page": 19
+  },
+  {
+    "id": "adv_pg_ppo_alg",
+    "pdf": "Clase 10 - Gradientes de política avanzados(2).pdf",
+    "page": 21,
+    "title": "Pseudocódigo PPO-Clip",
+    "desc": "Recolectar trayectorias, estimar ventaja, optimizar objetivo clippeado.",
+    "file": "assets/slides/adv_pg_ppo_alg.jpg",
+    "pdf_page": 21
+  },
+  {
+    "id": "td3_double_q",
+    "pdf": "Clase 11 - Actor-Crítico Avanzado-1.pdf",
+    "page": 3,
+    "title": "TD3: clipped double Q",
+    "desc": "Usar dos críticos y tomar el mínimo para evitar sobreestimación.",
+    "file": "assets/slides/td3_double_q.jpg",
+    "pdf_page": 3
+  },
+  {
+    "id": "td3_delay",
+    "pdf": "Clase 11 - Actor-Crítico Avanzado-1.pdf",
+    "page": 5,
+    "title": "TD3: delayed updates",
+    "desc": "Actualizar actor y target menos seguido que el crítico.",
+    "file": "assets/slides/td3_delay.jpg",
+    "pdf_page": 5
+  },
+  {
+    "id": "td3_smoothing",
+    "pdf": "Clase 11 - Actor-Crítico Avanzado-1.pdf",
+    "page": 6,
+    "title": "TD3: target policy smoothing",
+    "desc": "Agregar ruido clippeado a acciones target.",
+    "file": "assets/slides/td3_smoothing.jpg",
+    "pdf_page": 6
+  },
+  {
+    "id": "sac_objective",
+    "pdf": "Clase 11 - Actor-Crítico Avanzado-1.pdf",
+    "page": 10,
+    "title": "SAC: objetivo con entropía",
+    "desc": "Maximizar recompensa + αH(π).",
+    "file": "assets/slides/sac_objective.jpg",
+    "pdf_page": 10
+  },
+  {
+    "id": "sac_soft_bellman",
+    "pdf": "Clase 11 - Actor-Crítico Avanzado-1.pdf",
+    "page": 11,
+    "title": "SAC: soft Bellman backup",
+    "desc": "Q y V incorporan entropía/log π.",
+    "file": "assets/slides/sac_soft_bellman.jpg",
+    "pdf_page": 11
+  },
+  {
+    "id": "sac_target",
+    "pdf": "Clase 11 - Actor-Crítico Avanzado-1.pdf",
+    "page": 14,
+    "title": "SAC moderno",
+    "desc": "Target con min de dos Q y término -α log π.",
+    "file": "assets/slides/sac_target.jpg",
+    "pdf_page": 14
+  }
+]
