@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leaderboard · Repaso RL</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%278%27 fill=%27%23f7f6f0%27/%3E%3Cpath d=%27M14 43h36M14 32h36M14 21h36%27 stroke=%27%230f766e%27 stroke-width=%275%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg: #eef4ef;
+      --paper: #fffdf6;
+      --ink: #17212b;
+      --muted: #566474;
+      --line: #d2ddd6;
+      --accent: #0c665d;
+      --danger: #a7352b;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      --sans: "Atkinson Hyperlegible", "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    }
+    * { box-sizing: border-box; }
+    html { color-scheme: light; overflow-x: hidden; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(90deg, rgba(49,93,131,.055) 1px, transparent 1px) 0 0 / 5.5rem 5.5rem,
+        linear-gradient(180deg, #f7faf4 0%, var(--bg) 100%);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.6;
+    }
+    main {
+      width: min(58rem, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: clamp(1rem, 4vw, 2.5rem) 0 4rem;
+    }
+    a { color: #315d83; text-underline-offset: .16em; }
+    .back {
+      display: inline-flex;
+      margin-bottom: 1.4rem;
+      color: #405063;
+      font-size: .9rem;
+      font-weight: 760;
+    }
+    header {
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #1f2c36;
+      margin-bottom: 1.3rem;
+    }
+    h1 {
+      max-width: 15ch;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.02;
+    }
+    header p,
+    .status,
+    .score-note {
+      max-width: 68ch;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+    .panel {
+      display: grid;
+      gap: .85rem;
+      padding: .95rem;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-top: 2px solid #1f2c36;
+      border-radius: .25rem;
+    }
+    .panel > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      align-items: center;
+    }
+    .profile-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: .75rem;
+      align-items: center;
+      padding: .7rem;
+      background: #f8fbf5;
+      border: 1px solid var(--line);
+      border-radius: .22rem;
+    }
+    .avatar-preview,
+    .avatar {
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #eaf1ed;
+      border: 1px solid #c9d7d0;
+      color: #405063;
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 760;
+    }
+    .avatar-preview {
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: .35rem;
+    }
+    .avatar {
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: .25rem;
+    }
+    .avatar-preview img,
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .photo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem;
+      align-items: center;
+    }
+    .camera-panel {
+      display: grid;
+      gap: .55rem;
+      padding: .65rem;
+      background: #f8fbf5;
+      border: 1px solid var(--line);
+      border-radius: .22rem;
+    }
+    .camera-panel[hidden] { display: none; }
+    .camera-panel video {
+      width: min(100%, 22rem);
+      aspect-ratio: 4 / 3;
+      background: #111;
+      border-radius: .2rem;
+      object-fit: cover;
+    }
+    button {
+      min-height: 2.35rem;
+      border: 1px solid #a9bab3;
+      border-radius: .2rem;
+      background: #fff;
+      color: #243142;
+      cursor: pointer;
+      font-weight: 760;
+      padding: .45rem .75rem;
+    }
+    button:hover { background: #e8f4f0; border-color: #8cb3aa; color: #0d4b44; }
+    .status { min-height: 1.4rem; margin: 0; overflow-wrap: anywhere; }
+    .score-note {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+      gap: .4rem;
+      margin: 0;
+    }
+    .score-note span {
+      padding: .42rem .5rem;
+      background: #f8fbf5;
+      border: 1px solid var(--line);
+      border-radius: .2rem;
+      font-family: var(--mono);
+      font-size: .8rem;
+    }
+    ol {
+      display: grid;
+      gap: .4rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      width: 100%;
+    }
+    li {
+      display: grid;
+      grid-template-columns: 2.4rem 2.35rem minmax(0, 1fr) auto;
+      gap: .6rem;
+      align-items: center;
+      padding: .55rem .6rem;
+      background: #f8fbf5;
+      border: 1px solid var(--line);
+      border-radius: .22rem;
+    }
+    .rank { color: #667586; font-family: var(--mono); font-size: .8rem; }
+    .name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 780;
+    }
+    .score {
+      color: #0b594f;
+      font-family: var(--mono);
+      font-size: .84rem;
+      white-space: nowrap;
+    }
+    .setup {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .88rem;
+    }
+    code {
+      color: #183044;
+      background: #eef3f0;
+      border-radius: .2rem;
+      padding: .05em .3em;
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="index.html">Volver al apunte</a>
+    <header>
+      <h1>Leaderboard de certificación</h1>
+      <p>Sin cuenta ni signin: al publicar, se pide un nombre visible y se sube solo ese nombre con el puntaje calculado desde tu progreso local.</p>
+    </header>
+
+    <section class="panel" aria-labelledby="board-title">
+      <h2 id="board-title">Tabla pública</h2>
+      <p class="status" id="status" aria-live="polite">Cargando...</p>
+      <div class="profile-row">
+        <div class="avatar-preview" aria-label="Foto elegida">
+          <img id="avatarPreview" alt="" hidden>
+          <span id="avatarFallback">Foto</span>
+        </div>
+        <div>
+          <div class="photo-actions">
+            <button id="importPhoto" type="button">Importar foto</button>
+            <button id="takePhoto" type="button">Tomar foto</button>
+            <button id="removePhoto" type="button">Quitar</button>
+            <input id="avatarFile" type="file" accept="image/*" hidden>
+          </div>
+        </div>
+      </div>
+      <div class="camera-panel" id="cameraPanel" hidden>
+        <video id="cameraVideo" autoplay playsinline muted></video>
+        <div class="actions">
+          <button id="capturePhoto" type="button">Usar esta foto</button>
+          <button id="cancelCamera" type="button">Cancelar cámara</button>
+        </div>
+      </div>
+      <div class="score-note" id="scoreNote"></div>
+      <ol id="leaderboard">
+        <li><span class="rank">--</span><span class="avatar">--</span><span class="name">Cargando leaderboard</span><span class="score">--</span></li>
+      </ol>
+    </section>
+  </main>
+
+  <script>
+  window.RL_SUPABASE_CONFIG = {
+    url: 'https://tuqoesvomdzldimfkqsp.supabase.co',
+    anonKey: 'sb_publishable__dcNiqCVgCLfdQjHxEC84g_DJpzf1ly',
+    table: 'rl_leaderboard'
+  };
+  </script>
+  <script>
+  (function () {
+    const sectionIds = ['fundamentos','imitacion','pg','actor-critic','valor','dqn','pg-avanzado','ac-avanzado','comparaciones','demos','ejercicios','preguntas','glosario'];
+    const config = window.RL_SUPABASE_CONFIG;
+    const status = document.getElementById('status');
+    const board = document.getElementById('leaderboard');
+    const scoreNote = document.getElementById('scoreNote');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const avatarFallback = document.getElementById('avatarFallback');
+    const avatarFile = document.getElementById('avatarFile');
+    const cameraPanel = document.getElementById('cameraPanel');
+    const cameraVideo = document.getElementById('cameraVideo');
+    let cameraStream = null;
+    const storage = {
+      get(key) { try { return localStorage.getItem(key); } catch (err) { return null; } },
+      set(key, value) { try { localStorage.setItem(key, value); } catch (err) {} },
+      remove(key) { try { localStorage.removeItem(key); } catch (err) {} }
+    };
+    const avatarKey = 'rl-leaderboard-avatar';
+
+    function setStatus(message) { status.textContent = message; }
+    function countStored(prefix, predicate) {
+      let count = 0;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith(prefix)) continue;
+        const value = storage.get(key);
+        if (!predicate || predicate(value, key)) count += 1;
+      }
+      return count;
+    }
+    function miniQuizCorrectCount() {
+      return sectionIds.reduce((sum, id) => {
+        const raw = storage.get('rl-mini-quiz-v2:' + id);
+        if (!raw) return sum;
+        try {
+          const parsed = JSON.parse(raw);
+          if (!parsed.checked) return sum;
+          if (Number.isFinite(Number(parsed.score))) return sum + Number(parsed.score);
+          if (parsed.passed) return sum + Number(parsed.total || 3);
+        } catch (err) {}
+        return sum;
+      }, 0);
+    }
+    function currentScore() {
+      const miniCorrect = miniQuizCorrectCount();
+      const globalCorrect = countStored('rl-quiz-v2:', value => value === 'known');
+      const certificates = sectionIds.filter(id => storage.get('rl-section-cert-v1:' + id)).length;
+      const miniPassed = sectionIds.filter((id) => {
+        const raw = storage.get('rl-mini-quiz-v2:' + id);
+        if (!raw) return false;
+        try { return JSON.parse(raw).passed === true; } catch (err) { return false; }
+      }).length;
+      const quizKnown = countStored('rl-quiz-v2:', value => value === 'known');
+      const demosKnown = countStored('rl-demo-v1:', value => value === 'known');
+      const score = miniCorrect + globalCorrect;
+      return { score, miniCorrect, globalCorrect, certificates, miniPassed, quizKnown, demosKnown };
+    }
+    function renderScoreNote() {
+      const s = currentScore();
+      scoreNote.innerHTML = '';
+      [
+        ['respuestas correctas', s.score],
+        ['mini quiz', s.miniCorrect],
+        ['preguntas globales', s.globalCorrect]
+      ].forEach(([label, value]) => {
+        const span = document.createElement('span');
+        span.textContent = label + ': ' + value;
+        scoreNote.appendChild(span);
+      });
+    }
+    function isSafeAvatarData(value) {
+      return /^data:image\/(?:jpeg|png|webp);base64,/i.test(String(value || ''));
+    }
+    function renderAvatarPreview() {
+      const dataUrl = storage.get(avatarKey);
+      if (isSafeAvatarData(dataUrl)) {
+        avatarPreview.src = dataUrl;
+        avatarPreview.hidden = false;
+        avatarFallback.hidden = true;
+      } else {
+        if (dataUrl) storage.remove(avatarKey);
+        avatarPreview.removeAttribute('src');
+        avatarPreview.hidden = true;
+        avatarFallback.hidden = false;
+      }
+    }
+    function imageToDataUrl(source) {
+      const canvas = document.createElement('canvas');
+      const size = 192;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const width = source.videoWidth || source.naturalWidth || source.width;
+      const height = source.videoHeight || source.naturalHeight || source.height;
+      const side = Math.min(width, height);
+      const sx = Math.max(0, (width - side) / 2);
+      const sy = Math.max(0, (height - side) / 2);
+      ctx.drawImage(source, sx, sy, side, side, 0, 0, size, size);
+      return canvas.toDataURL('image/jpeg', 0.78);
+    }
+    function loadImage(file) {
+      return new Promise((resolve, reject) => {
+        if (!file || !file.type.startsWith('image/')) {
+          reject(new Error('Archivo no válido.'));
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          reject(new Error('La imagen supera 5 MB.'));
+          return;
+        }
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('No pude abrir la imagen.'));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+    async function importAvatar(file) {
+      try {
+        const image = await loadImage(file);
+        storage.set(avatarKey, imageToDataUrl(image));
+        if (image.src.startsWith('blob:')) URL.revokeObjectURL(image.src);
+        renderAvatarPreview();
+        setStatus('Foto lista para publicar con tu puntaje.');
+      } catch (err) {
+        setStatus(err.message || 'No pude usar esa foto.');
+      }
+    }
+    function stopCamera() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      cameraPanel.hidden = true;
+      cameraVideo.srcObject = null;
+    }
+    async function startCamera() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setStatus('Este navegador no permite cámara directa. Podés importar una foto.');
+        return;
+      }
+      try {
+        stopCamera();
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        cameraVideo.srcObject = cameraStream;
+        cameraPanel.hidden = false;
+        setStatus('Cámara lista.');
+      } catch (err) {
+        setStatus('No pude abrir la cámara. Probá importar una foto.');
+      }
+    }
+    function captureAvatar() {
+      if (!cameraStream || !cameraVideo.videoWidth) {
+        setStatus('Esperá a que cargue la cámara.');
+        return;
+      }
+      storage.set(avatarKey, imageToDataUrl(cameraVideo));
+      stopCamera();
+      renderAvatarPreview();
+      setStatus('Foto tomada.');
+    }
+    async function supabaseRequest(path, options) {
+      const base = config.url.replace(/\/$/, '');
+      const headers = Object.assign({
+        apikey: config.anonKey,
+        Authorization: 'Bearer ' + config.anonKey,
+        'Content-Type': 'application/json'
+      }, options?.headers || {});
+      const res = await fetch(base + '/rest/v1/' + path, Object.assign({}, options, { headers }));
+      if (!res.ok) {
+        const error = new Error(await res.text().catch(() => '') || 'Supabase ' + res.status);
+        error.status = res.status;
+        throw error;
+      }
+      if (res.status === 204) return null;
+      return res.json();
+    }
+    function renderRows(rows) {
+      board.innerHTML = '';
+      if (!rows || !rows.length) {
+        board.innerHTML = '<li><span class="rank">--</span><span class="avatar">--</span><span class="name">Todavía no hay puntajes</span><span class="score">0</span></li>';
+        return;
+      }
+      rows.forEach((row, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = '<span class="rank"></span><span class="avatar"></span><span class="name"></span><span class="score"></span>';
+        li.querySelector('.rank').textContent = '#' + (index + 1);
+        const avatar = li.querySelector('.avatar');
+        if (isSafeAvatarData(row.avatar_data)) {
+          const img = document.createElement('img');
+          img.src = row.avatar_data;
+          img.alt = '';
+          avatar.appendChild(img);
+        } else {
+          avatar.textContent = '--';
+        }
+        li.querySelector('.name').textContent = row.display_name || 'Sin nombre';
+        li.querySelector('.score').textContent = String(row.score || 0);
+        board.appendChild(li);
+      });
+    }
+    async function loadLeaderboard(silent) {
+      try {
+        if (!silent) setStatus('Cargando leaderboard...');
+        let rows;
+        try {
+          rows = await supabaseRequest(
+            encodeURIComponent(config.table) + '?select=display_name,avatar_data,score,certificates,mini_quizzes,quiz_known,demos_known,created_at&order=score.desc,created_at.asc&limit=10',
+            { method: 'GET' }
+          );
+        } catch (err) {
+          if (err.status !== 400 || !String(err.message).includes('avatar_data')) throw err;
+          rows = await supabaseRequest(
+            encodeURIComponent(config.table) + '?select=display_name,score,certificates,mini_quizzes,quiz_known,demos_known,created_at&order=score.desc,created_at.asc&limit=10',
+            { method: 'GET' }
+          );
+          if (!silent) setStatus('Leaderboard actualizado. Falta agregar avatar_data text para mostrar fotos.');
+          renderRows(rows);
+          return;
+        }
+        renderRows(rows);
+        if (!silent) setStatus('Leaderboard actualizado.');
+      } catch (err) {
+        if (!silent) setStatus(err.status === 404 ? 'Supabase conectado, pero falta la tabla rl_leaderboard.' : 'No pude leer Supabase. Revisá tabla/RLS/config.');
+      }
+    }
+    document.getElementById('importPhoto').addEventListener('click', () => avatarFile.click());
+    document.getElementById('takePhoto').addEventListener('click', startCamera);
+    document.getElementById('capturePhoto').addEventListener('click', captureAvatar);
+    document.getElementById('cancelCamera').addEventListener('click', stopCamera);
+    document.getElementById('removePhoto').addEventListener('click', () => {
+      storage.remove(avatarKey);
+      renderAvatarPreview();
+      setStatus('Foto quitada.');
+    });
+    avatarFile.addEventListener('change', () => {
+      const file = avatarFile.files?.[0];
+      avatarFile.value = '';
+      if (file) importAvatar(file);
+    });
+    window.addEventListener('pagehide', stopCamera);
+    renderAvatarPreview();
+    renderScoreNote();
+    loadLeaderboard();
+    window.setInterval(() => loadLeaderboard(true), 5000);
+  })();
+  </script>
+</body>
+</html>
